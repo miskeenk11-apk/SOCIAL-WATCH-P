@@ -25,11 +25,12 @@ jobs:
           gradle-version: '8.7'
 
       - name: Build APK
-        run: cd "SOCAIL WATCH P"
-gradle :app:assembleDebug --no-daemon
+        run: |
+          cd "SOCAIL WATCH P"
+          gradle :app:assembleDebug --no-daemon
 
       - name: Upload APK
         uses: actions/upload-artifact@v4
         with:
           name: social-watch-debug-apk
-          path: app/build/outputs/apk/debug/app-debug.apk
+          path: SOCAIL WATCH P/app/build/outputs/apk/debug/app-debug.apk
