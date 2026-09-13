@@ -1,99 +1,213 @@
 package com.socialwatch;
 
-import android.content.Intent;
-import android.graphics.Color;
+import android.content.Context;
+import android.net.ConnectivityManager;
+import android.net.NetworkInfo;
 import android.os.Bundle;
+import android.os.Handler;
+import android.os.Looper;
+import android.graphics.Color;
 import android.view.Gravity;
 import android.view.View;
+import android.widget.Button;
+import android.widget.FrameLayout;
 import android.widget.ImageButton;
 import android.widget.ImageView;
 import android.widget.LinearLayout;
-import android.widget.Space;
 import android.widget.TextView;
 
 import androidx.appcompat.app.AppCompatActivity;
 
 public class MainActivity extends AppCompatActivity {
 
-    private int dp(float v) {
-        return (int) (v * getResources().getDisplayMetrics().density + 0.5f);
-    }
+    private TextView internetStatus;
+    private final Handler handler = new Handler(Looper.getMainLooper());
 
-    private ImageButton imageButton(int drawableId, String description) {
-        ImageButton b = new ImageButton(this);
-        b.setImageResource(drawableId);
-        b.setScaleType(ImageView.ScaleType.FIT_CENTER);
-        b.setAdjustViewBounds(true);
-        b.setBackgroundColor(Color.TRANSPARENT);
-        b.setPadding(0, 0, 0, 0);
-        b.setContentDescription(description);
-        b.setFocusable(true);
-        return b;
-    }
-
-    private void addGap(LinearLayout root, int heightDp) {
-        Space gap = new Space(this);
-        root.addView(gap, new LinearLayout.LayoutParams(-1, dp(heightDp)));
-    }
+    private final Runnable internetChecker = new Runnable() {
+        @Override
+        public void run() {
+            updateInternetStatus();
+            handler.postDelayed(this, 1500);
+        }
+    };
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
 
-        getWindow().setStatusBarColor(Color.rgb(4,4,4));
-        getWindow().setNavigationBarColor(Color.BLACK);
+        FrameLayout root = new FrameLayout(this);
+        root.setBackgroundColor(Color.WHITE);
 
-        LinearLayout root = new LinearLayout(this);
-        root.setOrientation(LinearLayout.VERTICAL);
-        root.setGravity(Gravity.CENTER_HORIZONTAL);
-        root.setPadding(dp(18), dp(10), dp(18), dp(10));
-        root.setBackgroundColor(Color.BLACK);
+        LinearLayout mainLayout = new LinearLayout(this);
+        mainLayout.setOrientation(LinearLayout.VERTICAL);
+        mainLayout.setGravity(Gravity.CENTER_HORIZONTAL);
+        mainLayout.setPadding(dp(14), dp(8), dp(14), dp(6));
 
-        // Header and three buttons are cropped from the supplied reference image,
-        // preserving its exact visual artwork.
+        FrameLayout.LayoutParams mainParams =
+                new FrameLayout.LayoutParams(
+                        FrameLayout.LayoutParams.MATCH_PARENT,
+                        FrameLayout.LayoutParams.MATCH_PARENT
+                );
+
+        root.addView(mainLayout, mainParams);
+
+        // Header
         ImageView header = new ImageView(this);
         header.setImageResource(R.drawable.header);
+        header.setAdjustViewBounds(true);
         header.setScaleType(ImageView.ScaleType.FIT_CENTER);
-        root.addView(header, new LinearLayout.LayoutParams(-1, dp(175)));
 
-        addGap(root, 5);
+        mainLayout.addView(header,
+                new LinearLayout.LayoutParams(
+                        LinearLayout.LayoutParams.MATCH_PARENT,
+                        LinearLayout.LayoutParams.WRAP_CONTENT
+                ));
 
-        ImageButton youtube = imageButton(R.drawable.youtube_button, "YouTube Shorts");
-        root.addView(youtube, new LinearLayout.LayoutParams(-1, dp(205)));
-        youtube.setOnClickListener(v -> openService("YouTube", Config.DEFAULT_YOUTUBE_URL));
+        // YouTube
+        ImageButton youtube = createImageButton(R.drawable.youtube_button);
+        mainLayout.addView(youtube);
 
-        addGap(root, 14);
+        youtube.setOnClickListener(v ->
+                openService(Config.DEFAULT_YOUTUBE_URL)
+        );
 
-        ImageButton facebook = imageButton(R.drawable.facebook_button, "Facebook Reels");
-        root.addView(facebook, new LinearLayout.LayoutParams(-1, dp(205)));
-        facebook.setOnClickListener(v -> openService("Facebook", Config.DEFAULT_FACEBOOK_URL));
+        // Facebook
+        ImageButton facebook = createImageButton(R.drawable.facebook_button);
+        mainLayout.addView(facebook);
 
-        addGap(root, 14);
+        facebook.setOnClickListener(v ->
+                openService(Config.DEFAULT_FACEBOOK_URL)
+        );
 
-        ImageButton tiktok = imageButton(R.drawable.tiktok_button, "TikTok Short Videos");
-        root.addView(tiktok, new LinearLayout.LayoutParams(-1, dp(205)));
-        tiktok.setOnClickListener(v -> openService("TikTok", Config.DEFAULT_TIKTOK_URL));
+        // TikTok
+        ImageButton tiktok = createImageButton(R.drawable.tiktok_button);
+        mainLayout.addView(tiktok);
 
-        Space spacer = new Space(this);
-        root.addView(spacer, new LinearLayout.LayoutParams(-1, 0, 1));
+        tiktok.setOnClickListener(v ->
+                openService(Config.DEFAULT_TIKTOK_URL)
+        );
 
-        TextView about = new TextView(this);
-        about.setText("About");
-        about.setTextColor(Color.LTGRAY);
-        about.setTextSize(14);
-        about.setGravity(Gravity.CENTER);
-        about.setBackgroundResource(R.drawable.bg_about);
-        about.setFocusable(true);
-        about.setOnClickListener(v -> startActivity(new Intent(this, AboutActivity.class)));
-        root.addView(about, new LinearLayout.LayoutParams(dp(105), dp(46)));
+        // About button
+        Button about = new Button(this);
+        about.setText("ABOUT");
+        about.setTextSize(13);
+        about.setAllCaps(false);
+        about.setPadding(0, 0, 0, 0);
+
+        LinearLayout.LayoutParams aboutParams =
+                new LinearLayout.LayoutParams(
+                        dp(105),
+                        dp(40)
+                );
+        aboutParams.gravity = Gravity.CENTER_HORIZONTAL;
+        aboutParams.topMargin = dp(2);
+
+        mainLayout.addView(about, aboutParams);
+
+        about.setOnClickListener(v ->
+                startActivity(new android.content.Intent(
+                        MainActivity.this,
+                        AboutActivity.class
+                ))
+        );
+
+        // Internet status
+        internetStatus = new TextView(this);
+        internetStatus.setTextSize(10);
+        internetStatus.setGravity(Gravity.CENTER);
+        internetStatus.setTypeface(null, android.graphics.Typeface.BOLD);
+        internetStatus.setBackgroundColor(Color.WHITE);
+        internetStatus.setPadding(dp(2), 0, dp(2), 0);
+
+        FrameLayout.LayoutParams statusParams =
+                new FrameLayout.LayoutParams(
+                        dp(118),
+                        dp(28),
+                        Gravity.TOP | Gravity.RIGHT
+                );
+
+        statusParams.rightMargin = dp(8);
+        statusParams.topMargin = dp(3);
+
+        root.addView(internetStatus, statusParams);
 
         setContentView(root);
+
+        updateInternetStatus();
+        handler.postDelayed(internetChecker, 1500);
     }
 
-    private void openService(String service, String url) {
-        Intent i = new Intent(this, WebActivity.class);
-        i.putExtra(WebActivity.EXTRA_SERVICE, service);
-        i.putExtra(WebActivity.EXTRA_URL, url);
-        startActivity(i);
+    private ImageButton createImageButton(int imageResource) {
+
+        ImageButton button = new ImageButton(this);
+
+        button.setImageResource(imageResource);
+        button.setBackgroundColor(Color.TRANSPARENT);
+        button.setAdjustViewBounds(true);
+        button.setScaleType(ImageView.ScaleType.FIT_CENTER);
+        button.setPadding(0, 0, 0, 0);
+        button.setContentDescription("Social media button");
+
+        LinearLayout.LayoutParams params =
+                new LinearLayout.LayoutParams(
+                        LinearLayout.LayoutParams.MATCH_PARENT,
+                        LinearLayout.LayoutParams.WRAP_CONTENT
+                );
+
+        params.topMargin = dp(2);
+        params.bottomMargin = dp(2);
+
+        button.setLayoutParams(params);
+
+        return button;
+    }
+
+    private void updateInternetStatus() {
+
+        ConnectivityManager connectivityManager =
+                (ConnectivityManager) getSystemService(
+                        Context.CONNECTIVITY_SERVICE
+                );
+
+        boolean connected = false;
+
+        if (connectivityManager != null) {
+
+            NetworkInfo networkInfo =
+                    connectivityManager.getActiveNetworkInfo();
+
+            connected = networkInfo != null
+                    && networkInfo.isConnected();
+        }
+
+        if (connected) {
+            internetStatus.setText("Internet: AVAILABLE");
+            internetStatus.setTextColor(Color.rgb(0, 150, 0));
+        } else {
+            internetStatus.setText("Internet: UNAVAILABLE");
+            internetStatus.setTextColor(Color.RED);
+        }
+    }
+
+    private int dp(int value) {
+        return (int) (value *
+                getResources().getDisplayMetrics().density + 0.5f);
+    }
+
+    @Override
+    protected void onDestroy() {
+        handler.removeCallbacks(internetChecker);
+        super.onDestroy();
+    }
+
+    private void openService(String url) {
+        android.content.Intent intent =
+                new android.content.Intent(
+                        MainActivity.this,
+                        WebActivity.class
+                );
+
+        intent.putExtra("url", url);
+        startActivity(intent);
     }
 }
