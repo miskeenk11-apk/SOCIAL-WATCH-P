@@ -68,7 +68,7 @@ public class MainActivity extends AppCompatActivity {
         mainLayout.addView(youtube);
 
         youtube.setOnClickListener(v ->
-                openService(Config.DEFAULT_YOUTUBE_URL)
+                openService("YouTube", Config.DEFAULT_YOUTUBE_URL)
         );
 
         // Facebook
@@ -76,7 +76,7 @@ public class MainActivity extends AppCompatActivity {
         mainLayout.addView(facebook);
 
         facebook.setOnClickListener(v ->
-                openService(Config.DEFAULT_FACEBOOK_URL)
+                openService("Facebook", Config.DEFAULT_FACEBOOK_URL)
         );
 
         // TikTok
@@ -84,7 +84,7 @@ public class MainActivity extends AppCompatActivity {
         mainLayout.addView(tiktok);
 
         tiktok.setOnClickListener(v ->
-                openService(Config.DEFAULT_TIKTOK_URL)
+                openService("TikTok", Config.DEFAULT_TIKTOK_URL)
         );
 
         // About button
@@ -99,6 +99,7 @@ public class MainActivity extends AppCompatActivity {
                         dp(105),
                         dp(40)
                 );
+
         aboutParams.gravity = Gravity.CENTER_HORIZONTAL;
         aboutParams.topMargin = dp(2);
 
@@ -200,14 +201,17 @@ public class MainActivity extends AppCompatActivity {
         super.onDestroy();
     }
 
-    private void openService(String url) {
+    private void openService(String service, String url) {
+
         android.content.Intent intent =
                 new android.content.Intent(
                         MainActivity.this,
                         WebActivity.class
                 );
 
-        intent.putExtra("url", url);
+        intent.putExtra(WebActivity.EXTRA_SERVICE, service);
+        intent.putExtra(WebActivity.EXTRA_URL, url);
+
         startActivity(intent);
     }
 }
