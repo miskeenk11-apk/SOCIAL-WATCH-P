@@ -8,7 +8,6 @@ import android.os.Handler;
 import android.os.Looper;
 import android.graphics.Color;
 import android.view.Gravity;
-import android.view.View;
 import android.widget.Button;
 import android.widget.FrameLayout;
 import android.widget.ImageButton;
@@ -41,15 +40,13 @@ public class MainActivity extends AppCompatActivity {
         LinearLayout mainLayout = new LinearLayout(this);
         mainLayout.setOrientation(LinearLayout.VERTICAL);
         mainLayout.setGravity(Gravity.CENTER_HORIZONTAL);
-        mainLayout.setPadding(dp(14), dp(8), dp(14), dp(6));
+        mainLayout.setPadding(dp(14), dp(6), dp(14), dp(4));
 
-        FrameLayout.LayoutParams mainParams =
+        root.addView(mainLayout,
                 new FrameLayout.LayoutParams(
                         FrameLayout.LayoutParams.MATCH_PARENT,
                         FrameLayout.LayoutParams.MATCH_PARENT
-                );
-
-        root.addView(mainLayout, mainParams);
+                ));
 
         // Header
         ImageView header = new ImageView(this);
@@ -60,34 +57,56 @@ public class MainActivity extends AppCompatActivity {
         mainLayout.addView(header,
                 new LinearLayout.LayoutParams(
                         LinearLayout.LayoutParams.MATCH_PARENT,
-                        LinearLayout.LayoutParams.WRAP_CONTENT
+                        0,
+                        0.85f
                 ));
 
         // YouTube
-        ImageButton youtube = createImageButton(R.drawable.youtube_button);
-        mainLayout.addView(youtube);
+        ImageButton youtube =
+                createImageButton(R.drawable.youtube_button);
+
+        mainLayout.addView(youtube,
+                new LinearLayout.LayoutParams(
+                        LinearLayout.LayoutParams.MATCH_PARENT,
+                        0,
+                        1.0f
+                ));
 
         youtube.setOnClickListener(v ->
                 openService("YouTube", Config.DEFAULT_YOUTUBE_URL)
         );
 
         // Facebook
-        ImageButton facebook = createImageButton(R.drawable.facebook_button);
-        mainLayout.addView(facebook);
+        ImageButton facebook =
+                createImageButton(R.drawable.facebook_button);
+
+        mainLayout.addView(facebook,
+                new LinearLayout.LayoutParams(
+                        LinearLayout.LayoutParams.MATCH_PARENT,
+                        0,
+                        1.0f
+                ));
 
         facebook.setOnClickListener(v ->
                 openService("Facebook", Config.DEFAULT_FACEBOOK_URL)
         );
 
         // TikTok
-        ImageButton tiktok = createImageButton(R.drawable.tiktok_button);
-        mainLayout.addView(tiktok);
+        ImageButton tiktok =
+                createImageButton(R.drawable.tiktok_button);
+
+        mainLayout.addView(tiktok,
+                new LinearLayout.LayoutParams(
+                        LinearLayout.LayoutParams.MATCH_PARENT,
+                        0,
+                        1.0f
+                ));
 
         tiktok.setOnClickListener(v ->
                 openService("TikTok", Config.DEFAULT_TIKTOK_URL)
         );
 
-        // About button
+        // About
         Button about = new Button(this);
         about.setText("ABOUT");
         about.setTextSize(13);
@@ -97,12 +116,10 @@ public class MainActivity extends AppCompatActivity {
         LinearLayout.LayoutParams aboutParams =
                 new LinearLayout.LayoutParams(
                         dp(105),
-                        dp(40)
+                        dp(38)
                 );
 
         aboutParams.gravity = Gravity.CENTER_HORIZONTAL;
-        aboutParams.topMargin = dp(2);
-
         mainLayout.addView(about, aboutParams);
 
         about.setOnClickListener(v ->
@@ -112,11 +129,14 @@ public class MainActivity extends AppCompatActivity {
                 ))
         );
 
-        // Internet status
+        // Internet status - top right
         internetStatus = new TextView(this);
         internetStatus.setTextSize(10);
         internetStatus.setGravity(Gravity.CENTER);
-        internetStatus.setTypeface(null, android.graphics.Typeface.BOLD);
+        internetStatus.setTypeface(
+                null,
+                android.graphics.Typeface.BOLD
+        );
         internetStatus.setBackgroundColor(Color.WHITE);
         internetStatus.setPadding(dp(2), 0, dp(2), 0);
 
@@ -149,17 +169,6 @@ public class MainActivity extends AppCompatActivity {
         button.setPadding(0, 0, 0, 0);
         button.setContentDescription("Social media button");
 
-        LinearLayout.LayoutParams params =
-                new LinearLayout.LayoutParams(
-                        LinearLayout.LayoutParams.MATCH_PARENT,
-                        LinearLayout.LayoutParams.WRAP_CONTENT
-                );
-
-        params.topMargin = dp(2);
-        params.bottomMargin = dp(2);
-
-        button.setLayoutParams(params);
-
         return button;
     }
 
@@ -191,8 +200,11 @@ public class MainActivity extends AppCompatActivity {
     }
 
     private int dp(int value) {
-        return (int) (value *
-                getResources().getDisplayMetrics().density + 0.5f);
+        return (int) (
+                value *
+                getResources().getDisplayMetrics().density
+                + 0.5f
+        );
     }
 
     @Override
