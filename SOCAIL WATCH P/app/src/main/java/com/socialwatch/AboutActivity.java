@@ -1,71 +1,105 @@
 package com.socialwatch;
 
 import android.graphics.Color;
-import android.graphics.Typeface;
 import android.os.Bundle;
 import android.view.Gravity;
+import android.widget.Button;
 import android.widget.LinearLayout;
+import android.widget.ScrollView;
 import android.widget.TextView;
 
 import androidx.appcompat.app.AppCompatActivity;
 
 public class AboutActivity extends AppCompatActivity {
 
-    private int dp(float v) {
-        return (int) (v * getResources().getDisplayMetrics().density + 0.5f);
-    }
-
-    private TextView make(String s, float size, int color, boolean bold) {
-        TextView t = new TextView(this);
-        t.setText(s);
-        t.setTextSize(size);
-        t.setTextColor(color);
-        t.setGravity(Gravity.CENTER_HORIZONTAL);
-        t.setPadding(dp(12), dp(8), dp(12), dp(8));
-        if (bold) t.setTypeface(Typeface.DEFAULT, Typeface.BOLD);
-        return t;
+    private int dp(int value) {
+        return (int) (value *
+                getResources().getDisplayMetrics().density + 0.5f);
     }
 
     @Override
-    protected void onCreate(Bundle b) {
-        super.onCreate(b);
-        getWindow().setStatusBarColor(Color.BLACK);
-        getWindow().setNavigationBarColor(Color.BLACK);
+    protected void onCreate(Bundle savedInstanceState) {
+        super.onCreate(savedInstanceState);
 
-        LinearLayout root = new LinearLayout(this);
-        root.setOrientation(LinearLayout.VERTICAL);
-        root.setPadding(dp(22), dp(20), dp(22), dp(20));
-        root.setBackgroundColor(Color.BLACK);
+        LinearLayout mainLayout = new LinearLayout(this);
+        mainLayout.setOrientation(LinearLayout.VERTICAL);
+        mainLayout.setPadding(dp(18), dp(12), dp(18), dp(12));
+        mainLayout.setBackgroundColor(Color.WHITE);
 
-        TextView title = make("SOCIAL WATCH", 30, Color.rgb(0,150,245), true);
-        root.addView(title, new LinearLayout.LayoutParams(-1, dp(70)));
+        TextView title = new TextView(this);
+        title.setText("SOCIAL WATCH");
+        title.setTextSize(24);
+        title.setTextColor(Color.BLACK);
+        title.setGravity(Gravity.CENTER);
+        title.setTypeface(null, android.graphics.Typeface.BOLD);
 
-        TextView body = make(
-            "Short Video Browser\n\n" +
-            "SOCIAL WATCH ایک سادہ اور lightweight app ہے جس کا مقصد " +
-            "صرف Short Videos تک آسان رسائی دینا ہے۔\n\n" +
-            "YouTube → Shorts\n" +
-            "Facebook → Reels / Short Videos\n" +
-            "TikTok → Short Videos\n\n" +
-            "Main screen میں کوئی عام browser نہیں ہے۔ ہر button اپنے " +
-            "متعلقہ platform کو app کے اندر کھولتا ہے۔ YouTube اور Facebook " +
-            "Android WebView میں چلتے ہیں، جبکہ TikTok کو desktop-style view " +
-            "میں کھولا جاتا ہے۔\n\n" +
-            "یہ app پرانے Android devices کے لیے lightweight رکھا گیا ہے۔ " +
-            "App کی minimum Android compatibility API 21 (Android 5.0) ہے۔\n\n" +
-            "نوٹ: YouTube, Facebook اور TikTok اپنی websites کی compatibility " +
-            "خود control کرتے ہیں، اس لیے بہت پرانے WebView پر کچھ features " +
-            "محدود ہو سکتے ہیں۔",
-            17, Color.WHITE, false
+        mainLayout.addView(title,
+                new LinearLayout.LayoutParams(
+                        LinearLayout.LayoutParams.MATCH_PARENT,
+                        dp(55)
+                ));
+
+        ScrollView scrollView = new ScrollView(this);
+
+        TextView info = new TextView(this);
+        info.setTextSize(16);
+        info.setTextColor(Color.DKGRAY);
+        info.setLineSpacing(dp(2), 1.0f);
+
+        info.setText(
+                "SOCIAL WATCH\n\n" +
+
+                "یہ ایپ YouTube Shorts، Facebook Reels اور TikTok " +
+                "کی مختصر ویڈیوز کو ایک آسان جگہ سے دیکھنے کے لیے بنائی گئی ہے۔\n\n" +
+
+                "استعمال کرنے کا طریقہ:\n" +
+                "1. Main Screen پر YouTube، Facebook یا TikTok کا بٹن دبائیں۔\n" +
+                "2. منتخب کیا گیا پلیٹ فارم کھل جائے گا۔\n" +
+                "3. ویڈیوز دیکھنے کے لیے Swipe کر سکتے ہیں۔\n\n" +
+
+                "Internet:\n" +
+                "اس ایپ کو ویڈیوز چلانے کے لیے Internet Connection ضروری ہے۔ " +
+                "Wi-Fi یا Mobile Data موجود ہونے پر اوپر Internet: AVAILABLE نظر آئے گا۔ " +
+                "Internet نہ ہونے پر Internet: UNAVAILABLE نظر آئے گا۔\n\n" +
+
+                "Installation:\n" +
+                "APK فائل اپنے Android فون میں منتقل کریں، APK پر tap کریں " +
+                "اور Install منتخب کریں۔ اگر Android security warning دکھائے " +
+                "تو صرف اسی صورت میں Install کریں جب APK قابلِ اعتماد source سے حاصل کی گئی ہو۔\n\n" +
+
+                "Compatibility:\n" +
+                "یہ ایپ Android 5.0 (API 21) اور اس سے اوپر کے ورژنز کے لیے تیار کی گئی ہے۔ " +
+                "YouTube، Facebook اور TikTok کی اپنی website/app compatibility الگ ہو سکتی ہے۔\n\n" +
+
+                "Future Plans:\n" +
+                "ہم مستقبل میں SOCIAL WATCH کو مزید powerful اور بہتر بنانے کی کوشش کریں گے۔ " +
+                "مزید features، بہتر design اور آسان استعمال شامل کیے جا سکتے ہیں۔\n\n" +
+
+                "Thank you for using SOCIAL WATCH!"
         );
-        body.setGravity(Gravity.TOP | Gravity.CENTER_HORIZONTAL);
-        root.addView(body, new LinearLayout.LayoutParams(-1, 0, 1));
 
-        TextView back = make("←  Back", 16, Color.WHITE, true);
-        back.setBackgroundResource(com.socialwatch.R.drawable.bg_about);
-        back.setOnClickListener(v -> finish());
-        root.addView(back, new LinearLayout.LayoutParams(dp(120), dp(50)));
+        scrollView.addView(info);
 
-        setContentView(root);
+        mainLayout.addView(scrollView,
+                new LinearLayout.LayoutParams(
+                        LinearLayout.LayoutParams.MATCH_PARENT,
+                        0,
+                        1
+                ));
+
+        Button backButton = new Button(this);
+        backButton.setText("← BACK");
+        backButton.setTextSize(14);
+        backButton.setAllCaps(false);
+
+        mainLayout.addView(backButton,
+                new LinearLayout.LayoutParams(
+                        LinearLayout.LayoutParams.MATCH_PARENT,
+                        dp(48)
+                ));
+
+        backButton.setOnClickListener(v -> finish());
+
+        setContentView(mainLayout);
     }
 }
